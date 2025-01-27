@@ -46,6 +46,7 @@ function verifyJsonFarcasterSignatureNeynar(
   const dataBytes = Buffer.from(dataCompact, 'utf-8');
 
   const valid = secp256k1.verify(signatureBytes, dataBytes, custodyKeyBytes);
+  // const valid = ed25519.verify(signatureBytes, dataBytes, custodyKeyBytes);
 
   console.log(headerObj, payloadObj, signatureBytes);
 
