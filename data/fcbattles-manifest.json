@@ -1,0 +1,16 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjI2MjgwMCwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDEwN2IyYzM1MEEzRDMxZDUzYTFGNzY1ODU0NUU4ZEIxNTBEMGQ5RTQifQ",
+    "payload": "eyJkb21haW4iOiJmYy1iYXR0bGVzLnZlcmNlbC5hcHAifQ",
+    "signature": "MHhmNTUxNTU4NDJhYjljMzE3N2ZhNzAyYzdjODY0NGQ1ZTViOWU0MWIxZDU1Y2M0ZGRjZGIwODA3MjI3MWRmODNiNDdjNjZiMTk1MTEyZDAyNWExYjE3NjQ4Y2ZhOWJhMTQyNzE2ODg0YWUxYjU5MDYxMWRhY2UxMWFhNmIyNzNhMDFi"
+  },
+  "frame": {
+    "version": "0.0.1",
+    "name": "Farcaster Royale",
+    "iconUrl": "https://fc-battles.vercel.app/fc-royale-logo-small.jpg",
+    "homeUrl": "https://fc-battles.vercel.app",
+    "splashImageUrl": "https://fc-battles.vercel.app/fc-royale-logo.jpg",
+    "splashBackgroundColor": "#000000",
+    "webhookUrl": "https://fc-battles.vercel.app/api/webhook"
+  }
+}

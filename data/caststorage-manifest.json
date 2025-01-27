@@ -1,0 +1,17 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjE4NjQsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg3MTAzZWIwRDk5MkI2MGJlMjM0MzJCNUMxQjRCMEQzRDIwNTVCNTVFIn0",
+    "payload": "eyJkb21haW4iOiJjYXN0c3RvcmFnZS5jb20ifQ",
+    "signature": "MHg4NjU2YzhlODY3MjA5ZmNhZTdkYmNiNjg5MGU3OTM5ZTI0NGY0MTUxMzk0NTg2Yzg0YWM5Zjk4MDcwOTg5ZTJkMzUyNjc1ZTQzZDRkMzQzYWNiZGM3MjU0NWQwZTBjMjc1NDEyMzdmYzdiYzc2ZGI5NWQwNjU1NjU0NWY2ZWZiNDFj"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Caststorage",
+    "homeUrl": "https://caststorage.com/frame",
+    "iconUrl": "https://caststorage.com/icon.png",
+    "imageUrl": "https://caststorage.com/frame-og-2.png",
+    "buttonTitle": "Open Caststorage",
+    "splashImageUrl": "https://caststorage.com/splash.png",
+    "splashBackgroundColor": "#ffffff"
+  }
+}
