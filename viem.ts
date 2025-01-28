@@ -1,4 +1,12 @@
-import { createPublicClient, http } from 'viem';
+import {
+  createPublicClient,
+  hashMessage,
+  http,
+  recoverMessageAddress,
+  recoverPublicKey,
+  toPrefixedMessage,
+  verifyMessage,
+} from 'viem';
 import { optimism } from 'viem/chains';
 
 const viemClient = createPublicClient({
@@ -25,7 +33,13 @@ async function verifyJsonFarcasterSignatureNeynar(jws: {
   const payloadObj = JSON.parse(
     Buffer.from(jws.payload, 'base64url').toString('utf-8'),
   ) as Record<string, any>;
-  const signatureBytes = Buffer.from(jws.signature, 'base64url');
+  // JFS signature part is encoded as hex string rather than raw bytes.
+  // It's against JWS spec but it's how FIP does it ¯\_(^_^)_/¯
+  const signatureHexBytes = Buffer.from(jws.signature, 'base64url');
+  const signatureBytes = Buffer.from(
+    signatureHexBytes.toString('utf-8').slice(2),
+    'hex',
+  );
   const custodyKeyBytes = Buffer.from(headerObj.key.slice(2), 'hex');
 
   if (headerObj.type !== 'custody') {
@@ -37,7 +51,23 @@ async function verifyJsonFarcasterSignatureNeynar(jws: {
   const dataCompact = [jws.header, jws.payload].join('.');
   const dataBytes = Buffer.from(dataCompact, 'utf-8');
 
-  const valid = await viemClient.verifyMessage({
+  console.log({
+    prefix: Buffer.from(
+      toPrefixedMessage(dataCompact).slice(2),
+      'hex',
+    ).toString('utf-8'),
+    hash: hashMessage(dataCompact),
+    pubk: await recoverPublicKey({
+      hash: hashMessage(dataCompact),
+      signature: signatureBytes,
+    }),
+    rcad: await recoverMessageAddress({
+      message: dataCompact,
+      signature: signatureBytes,
+    }),
+  });
+
+  const valid = await verifyMessage({
     address: headerObj.key,
     message: dataCompact,
     signature: signatureBytes,
