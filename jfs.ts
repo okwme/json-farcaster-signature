@@ -16,7 +16,7 @@ type JFSHeader = {
  * See original spec:
  * https://github.com/farcasterxyz/protocol/discussions/208
  */
-function verifyJsonFarcasterSignatureNeynar(
+export function verifyJsonFarcasterSignature(
   jws:
     | {
         header: string;
@@ -66,22 +66,14 @@ function verifyJsonFarcasterSignatureNeynar(
   ]);
 
   const ethMsgHash = keccak_256(ethMsg);
+  // recover uncompressed key
   const pubKey = secpSig.recoverPublicKey(ethMsgHash).toRawBytes(false);
 
   // convert public key to eth address:
   // 1) remove 0x04 prefix, 2) hash, 3) take last 20 bytes
   const recoveredEthAddr = keccak_256(pubKey.subarray(1)).subarray(-20);
 
-  console.log({
-    prefix: ethMsg.toString('utf-8'),
-    hash: '0x' + Buffer.from(ethMsgHash).toString('hex'),
-    pubk: '0x' + Buffer.from(pubKey).toString('hex'),
-    rcad: '0x' + Buffer.from(recoveredEthAddr).toString('hex'),
-  });
-
   const valid = Buffer.from(ethAddrBytes).equals(recoveredEthAddr);
-
-  console.log({ valid });
 
   return {
     valid,
@@ -89,21 +81,3 @@ function verifyJsonFarcasterSignatureNeynar(
     payload: payloadObj,
   };
 }
-
-const manifests = await Promise.all([
-  import('./data/yoink-manifest.json', {
-    with: { type: 'json' },
-  }).then((v) => v.default),
-  import('./data/framedl-manifest.json', {
-    with: { type: 'json' },
-  }).then((v) => v.default),
-  import('./data/caststorage-manifest.json', {
-    with: { type: 'json' },
-  }).then((v) => v.default),
-  import('./data/fcbattles-manifest.json', {
-    with: { type: 'json' },
-  }).then((v) => v.default),
-]);
-const [yionk, framedl, caststorage, fcbattles] = manifests;
-
-verifyJsonFarcasterSignatureNeynar(yionk.accountAssociation);
