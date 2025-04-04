@@ -23,7 +23,7 @@ export function verifyJsonFarcasterSignature(
         payload: string;
         signature: string;
       }
-    | string,
+    | string
 ) {
   // unpack stringified JWS compact form
   if (typeof jws === 'string') {
@@ -33,30 +33,42 @@ export function verifyJsonFarcasterSignature(
   }
 
   const headerObj = JSON.parse(
-    Buffer.from(jws.header, 'base64url').toString('utf-8'),
+    Buffer.from(jws.header, 'base64url').toString('utf-8')
   ) as JFSHeader as any;
+  console.log({ headerObj });
   // JWS payload can be anything. for JSON Farcaster Signature, it is JSON
   const payloadObj = JSON.parse(
-    Buffer.from(jws.payload, 'base64url').toString('utf-8'),
+    Buffer.from(jws.payload, 'base64url').toString('utf-8')
   ) as Record<string, any>;
   // JFS signature part is encoded as hex string rather than raw bytes.
   // It's against JWS spec but it's how FIP does it ¯\_(^_^)_/¯
-  const sigHexBytes = Buffer.from(jws.signature, 'base64url');
-  const sigBytes = Buffer.from(sigHexBytes.toString('utf-8').slice(2), 'hex');
-  // Ethereum address in a header is encoded as hex string
-  const ethAddrBytes = Buffer.from(headerObj.key.slice(2), 'hex');
+  const sigBytes = Buffer.from(jws.signature, 'base64url');
 
-  // validate signature format
-  if (sigBytes.length !== 65) throw new Error('signature must be 65 bytes');
-  const v = sigBytes[64];
+  // Create a new buffer with 65 bytes (original 64 + 1 recovery byte)
+  const fullSigBytes = Buffer.alloc(65);
+  sigBytes.copy(fullSigBytes, 0); // Copy original signature into new buffer
+  fullSigBytes[64] = 27; // Add recovery bit (try 28 if 27 doesn't work)
+
+  // Now fullSigBytes should be 65 bytes
+  // console.log({ fullSigBytes });
+
+  // public key is a header
+  // const ethAddrBytes = Buffer.from(headerObj.key.slice(2), 'hex');
+
+  // validate signature formatf
+  if (fullSigBytes.length !== 65)
+    throw new Error(
+      'signature must be 65 bytes but received ' + fullSigBytes.length
+    );
+  const v = fullSigBytes[64];
   if (v !== 27 && v !== 28) throw new Error(`Invalid recovery id: ${v}`);
 
   const dataCompact = [jws.header, jws.payload].join('.');
   const dataBytes = Buffer.from(dataCompact, 'utf-8');
 
-  const recovery = sigBytes[64] - 27;
+  const recovery = fullSigBytes[64] - 27;
   const secpSig = secp.Signature.fromCompact(
-    sigBytes.subarray(0, 64),
+    fullSigBytes.subarray(0, 64)
   ).addRecoveryBit(recovery);
 
   // See: https://eips.ethereum.org/EIPS/eip-191
@@ -71,9 +83,9 @@ export function verifyJsonFarcasterSignature(
 
   // convert public key to eth address:
   // 1) remove 0x04 prefix, 2) hash, 3) take last 20 bytes
-  const recoveredEthAddr = keccak_256(pubKey.subarray(1)).subarray(-20);
+  // const recoveredEthAddr = keccak_256(pubKey.subarray(1)).subarray(-20);
 
-  const valid = Buffer.from(ethAddrBytes).equals(recoveredEthAddr);
+  const valid = headerObj.key.slice(2) == Buffer.from(pubKey).toString('hex');
 
   return {
     valid,
